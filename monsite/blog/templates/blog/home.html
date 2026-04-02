@@ -23,7 +23,8 @@
                     </div>
                 </div>
                 <div id="main-color-main">
-                    <form id="main-color-main-form" action="/submit_payroll/">
+                    <form id="main-color-main-form" method="POST" action="/submit_payroll/">
+                        {% csrf_token %}
                         <div id="form-colonnes">
                             <div id="groupe-pays">
                                 <label for="">Nom du service : </label>
@@ -47,7 +48,7 @@
 
                             <div id="groupe-prime">
                                 <label for="prime">Prime (€)</label>
-                                <input type="number" id="prime" name="prime" min="0" step="5" placeholder="0.00" />
+                                <input type="number" id="prime" name="prime" min="0" step="10" placeholder="0.00" />
                             </div>
 
                             <div id="groupe-heure">
