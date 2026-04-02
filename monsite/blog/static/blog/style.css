@@ -5,7 +5,8 @@
     box-sizing: border-box;
 }
 body {
-    background-color: black;
+    background-image: url("images/fondecran.jpg");
+    background-size: cover;
 }
 
 header {
@@ -17,7 +18,7 @@ header {
 #box-color-blue {
     width: 60%;
     height: 80%;
-    background-color: rgb(78, 93, 232);
+    color: white;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -38,7 +39,6 @@ main {
 #main-color {
     width: 90%;
     height: 90%;
-    background-color: rgb(78, 93, 232);
     border-radius: 20px;
 }
 #main-color-header {
@@ -47,6 +47,7 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
+    color: white;
 }
 #main-color-header-text {
     font-size: 1.5vw;
@@ -118,6 +119,7 @@ main {
     font-family: inherit;
     transition: all 0.3s ease;
     background-color: #f9f9f9;
+    font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
 }
 
 /* Checkboxes */
@@ -127,23 +129,20 @@ main {
     flex-wrap: wrap;
 }
 
-#option-mail,
-#option-telecharger {
+#option-mail {
     display: flex;
     align-items: center;
     gap: 10px;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-#mail,
-#telecharger {
+#mail {
     width: 20px;
     height: 20px;
     cursor: pointer;
 }
 
-#option-mail label,
-#option-telecharger label {
+#option-mail label {
     margin: 0;
     cursor: pointer;
     text-transform: none;
@@ -192,6 +191,24 @@ main {
 #btn-reinitialiser:hover {
     background-color: black;
     color: white;
+    transform: translateY(-2px);
+}
+
+#btn-telecharger {
+    padding: 1.5% 2%;
+    background-color: rgb(78, 93, 232);
+    color: white;
+    border: 2px solid white;
+    border-radius: 8px;
+    font-size: 1.2vw;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+
+    transition: all 0.3s ease;
+}
+
+#btn-telecharger:hover {
+    background-color: white;
+    color: rgb(78, 93, 232);
     transform: translateY(-2px);
 }
 
