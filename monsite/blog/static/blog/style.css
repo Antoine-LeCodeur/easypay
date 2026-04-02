@@ -1,0 +1,205 @@
+* {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    box-sizing: border-box;
+}
+body {
+    background-color: black;
+}
+
+header {
+    height: 15vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#box-color-blue {
+    width: 60%;
+    height: 80%;
+    background-color: rgb(78, 93, 232);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+}
+#box-color-blue-text {
+    font-size: 1.5vw;
+    text-decoration: underline;
+    font-weight: bold;
+    font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+}
+main {
+    height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#main-color {
+    width: 90%;
+    height: 90%;
+    background-color: rgb(78, 93, 232);
+    border-radius: 20px;
+}
+#main-color-header {
+    height: 20%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#main-color-header-text {
+    font-size: 1.5vw;
+    text-decoration: underline;
+    font-weight: bold;
+    font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+}
+#main-color-main {
+    height: 80%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+}
+#main-color-main-form {
+    width: 90%;
+    height: 90%;
+    background-color: rgb(78, 93, 232);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#form-colonnes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+/* Form groups */
+#groupe-pays,
+#groupe-personne,
+#groupe-prime,
+#groupe-heure,
+#groupe-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Full width sections */
+#groupe-options,
+#groupe-boutons {
+    grid-column: 1 / -1;
+}
+
+/* Labels */
+#groupe-pays > label,
+#groupe-personne > label,
+#groupe-prime > label,
+#groupe-heure > label,
+#groupe-options > label {
+    color: black;
+    font-size: 1.2vw;
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}
+
+#service,
+#personne,
+#prime,
+#heure {
+    padding: 2% 2%;
+    border-radius: 8px;
+    font-size: 1.2vw;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    background-color: #f9f9f9;
+}
+
+/* Checkboxes */
+#groupe-options-items {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+#option-mail,
+#option-telecharger {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#mail,
+#telecharger {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+#option-mail label,
+#option-telecharger label {
+    margin: 0;
+    cursor: pointer;
+    text-transform: none;
+}
+
+#groupe-boutons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+#btn-soumettre {
+    padding: 1.5% 2%;
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.2vw;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#btn-soumettre:hover {
+    background-color: white;
+    color: black;
+    transform: translateY(-2px);
+}
+
+/* Reset button */
+#btn-reinitialiser {
+    padding: 1.5% 2%;
+    background-color: white;
+    color: black;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2vw;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#btn-reinitialiser:hover {
+    background-color: black;
+    color: white;
+    transform: translateY(-2px);
+}
+
+#salaire {
+    align-self: flex-end;
+    padding: 1% 2%;
+    background-color: white;
+    color: black;
+    border-radius: 8px;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
