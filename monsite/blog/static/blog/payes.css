@@ -1,0 +1,128 @@
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    text-decoration: none;
+}
+body {
+    height: 100vh;
+    width: 100vw;
+    background-image: url("images/fondecran.jpg");
+    background-size: cover;
+}
+header {
+    height: 15vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.header-color {
+    height: 100%;
+    width: 70%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 0 0 30px 30px;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.header-color-titre {
+    font-size: 1.5rem;
+    font-weight: bold;
+    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+}
+.header-color-titre a {
+    color: white;
+}
+main {
+    height: 85vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.main-box {
+    height: 80%;
+    width: 70%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 30px;
+}
+.main-box-box {
+    height: 90%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-box-box-input {
+    height: 100%;
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    border-right: 4px solid white;
+}
+.main-box-box-button {
+    height: 100%;
+    width: 50%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-direction: column;
+}
+.main-box-box-input form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.main-box-box-input form label {
+    font-size: 1.2rem;
+    font-weight: bold;
+    font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+}
+.main-box-box-input form input,
+.main-box-box-input form select {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
+}
+.main-box-box-input-salaire {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+}
+.main-box-box-input-salaire h4 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
+}
+.main-box-box-button button {
+    padding: 25px 50px;
+    margin: 0 10px;
+    border-radius: 5px;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
+    transition: all 0.3s ease;
+}
+.main-box-box-button button:hover {
+    scale: calc(1.2);
+}
+#main-box-box-button-telecharger {
+    background-color: #4caf50;
+}
+#main-box-box-button-envoyer {
+    background-color: #2196f3;
+}
+#main-box-box-button-enregistrer {
+    background-color: #ff9800;
+}

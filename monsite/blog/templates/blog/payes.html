@@ -1,0 +1,56 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+    <head>
+        <link rel="stylesheet" href="{% static 'blog/payes.css' %}" />
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Paye</title>
+    </head>
+    <body>
+        <header>
+            <div class="header-color">
+                <div class="header-color-titre">
+                    <a href="index.html"><h1>EasyPay</h1></a>
+                </div>
+            </div>
+        </header>
+        <main>
+            <div class="main-box">
+                <div class="main-box-box">
+                    <div class="main-box-box-input">
+                        <form action="">
+                            <label for="">Service :</label>
+
+                            <select name="services" id="services">
+                                <option value="tous">Tous</option>
+                                <option value="payes">RH</option>
+                                <option value="calendrier">Direction</option>
+                                <option value="stats">Prod</option>
+                            </select>
+                            <label for="choix">Nom : </label>
+                            <select name="choix" id="choix">
+                                <option value="tous">Tous</option>
+                                <option value="payes">Antoine Boullanger</option>
+                                <option value="calendrier">Kylian Mbappé</option>
+                                <option value="stats">Antoine Griezmann</option>
+                            </select>
+                            <label for="prime">Prime : </label>
+                            <input type="number" name="prime" id="prime" placeholder="Montant de la prime" />
+                            <label for="heure-sup">Heure Sup : </label>
+                            <input type="number" name="heure-sup" id="heure-sup" placeholder="Nombre d'heures supplémentaires" />
+                        </form>
+                        <div class="main-box-box-input-salaire">
+                            <h4>Salaires : 1500 €</h4>
+                        </div>
+                    </div>
+                    <div class="main-box-box-button">
+                        <button id="main-box-box-button-telecharger">Télécharger</button>
+                        <button id="main-box-box-button-envoyer">Envoyer</button>
+                        <button id="main-box-box-button-enregistrer" type="submit">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>

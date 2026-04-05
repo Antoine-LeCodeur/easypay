@@ -1,0 +1,247 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+    <head>
+        <link rel="stylesheet" href="{% static 'blog/historique.css' %}" />
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Historique</title>
+    </head>
+    <body>
+        <header>
+            <div class="header-color">
+                <div class="header-color-titre">
+                    <a href="index.html"><h1>EasyPay</h1></a>
+                </div>
+            </div>
+        </header>
+        <main>
+            <div id="main-box">
+                <div id="main-box-filtres">
+                    <div id="main-box-filtres-box">
+                        <div id="main-box-filtres-box-titre">
+                            <h4>Filtres</h4>
+                        </div>
+                        <form id="main-box-filtres-box-form" action="">
+                            <label for="choix">Nom : </label>
+                            <select name="choix" id="choix">
+                                <option value="tous">Tous</option>
+                                <option value="payes">Antoine Boullanger</option>
+                                <option value="calendrier">Kylian Mbappé</option>
+                                <option value="stats">Antoine Griezmann</option>
+                            </select>
+                            <label for="services">Services : </label>
+                            <select name="services" id="services">
+                                <option value="tous">Tous</option>
+                                <option value="payes">RH</option>
+                                <option value="calendrier">Direction</option>
+                                <option value="stats">Prod</option>
+                            </select>
+                            <label for="date">Date : </label>
+                            <select name="date" id="date">
+                                <option value="toutes">Toutes</option>
+                                <option value="tous">Janvier</option>
+                                <option value="tous">Février</option>
+                                <option value="tous">Mars</option>
+                                <option value="tous">Avril</option>
+                                <option value="tous">Mai</option>
+                                <option value="tous">Juin</option>
+                                <option value="tous">Juillet</option>
+                                <option value="tous">Août</option>
+                                <option value="tous">Septembre</option>
+                                <option value="tous">Octobre</option>
+                                <option value="tous">Novembre</option>
+                                <option value="tous">Décembre</option>
+                            </select>
+                            <button type="submit">Afficher</button>
+                            <button type="submit">Reinitialiser</button>
+                        </form>
+                    </div>
+                </div>
+                <div id="main-box-historique">
+                    <div id="main-box-historique-titre">
+                        <h4>Historique des payes</h4>
+                    </div>
+                    <div id="main-box-historique-content">
+                        <div class="main-box-historique-content-item">
+                            <div class="main-box-historique-content-item-id">
+                                <p>1</p>
+                            </div>
+                            <div class="main-box-historique-content-item-infos">
+                                <p>Antoine Boullanger</p>
+                                <p>RH</p>
+                            </div>
+                            <div class="main-box-historique-content-item-date">
+                                <p>Janvier</p>
+                            </div>
+                            <div class="main-box-historique-content-item-salaires">
+                                <p>7000 €</p>
+                            </div>
+                            <div class="main-box-historique-content-item-dates">
+                                <p>15/01/2023</p>
+                                <p>09:00</p>
+                            </div>
+                            <div class="main-box-historique-content-item-actions">
+                                <a href=""><button type="button">Modifier</button></a>
+                            </div>
+                        </div>
+                        <div class="main-box-historique-content-item">
+                            <div class="main-box-historique-content-item-id">
+                                <p>1</p>
+                            </div>
+                            <div class="main-box-historique-content-item-infos">
+                                <p>Antoine Boullanger</p>
+                                <p>RH</p>
+                            </div>
+                            <div class="main-box-historique-content-item-date">
+                                <p>Janvier</p>
+                            </div>
+                            <div class="main-box-historique-content-item-salaires">
+                                <p>7000 €</p>
+                            </div>
+                            <div class="main-box-historique-content-item-dates">
+                                <p>15/01/2023</p>
+                                <p>09:00</p>
+                            </div>
+                            <div class="main-box-historique-content-item-actions">
+                                <a href=""><button type="button">Modifier</button></a>
+                            </div>
+                        </div>
+                        <div class="main-box-historique-content-item">
+                            <div class="main-box-historique-content-item-id">
+                                <p>1</p>
+                            </div>
+                            <div class="main-box-historique-content-item-infos">
+                                <p>Antoine Boullanger</p>
+                                <p>RH</p>
+                            </div>
+                            <div class="main-box-historique-content-item-date">
+                                <p>Janvier</p>
+                            </div>
+                            <div class="main-box-historique-content-item-salaires">
+                                <p>7000 €</p>
+                            </div>
+                            <div class="main-box-historique-content-item-dates">
+                                <p>15/01/2023</p>
+                                <p>09:00</p>
+                            </div>
+                            <div class="main-box-historique-content-item-actions">
+                                <a href=""><button type="button">Modifier</button></a>
+                            </div>
+                        </div>
+                        <div class="main-box-historique-content-item">
+                            <div class="main-box-historique-content-item-id">
+                                <p>1</p>
+                            </div>
+                            <div class="main-box-historique-content-item-infos">
+                                <p>Antoine Boullanger</p>
+                                <p>RH</p>
+                            </div>
+                            <div class="main-box-historique-content-item-date">
+                                <p>Janvier</p>
+                            </div>
+                            <div class="main-box-historique-content-item-salaires">
+                                <p>7000 €</p>
+                            </div>
+                            <div class="main-box-historique-content-item-dates">
+                                <p>15/01/2023</p>
+                                <p>09:00</p>
+                            </div>
+                            <div class="main-box-historique-content-item-actions">
+                                <a href=""><button type="button">Modifier</button></a>
+                            </div>
+                        </div>
+                        <div class="main-box-historique-content-item">
+                            <div class="main-box-historique-content-item-id">
+                                <p>1</p>
+                            </div>
+                            <div class="main-box-historique-content-item-infos">
+                                <p>Antoine Boullanger</p>
+                                <p>RH</p>
+                            </div>
+                            <div class="main-box-historique-content-item-date">
+                                <p>Janvier</p>
+                            </div>
+                            <div class="main-box-historique-content-item-salaires">
+                                <p>7000 €</p>
+                            </div>
+                            <div class="main-box-historique-content-item-dates">
+                                <p>15/01/2023</p>
+                                <p>09:00</p>
+                            </div>
+                            <div class="main-box-historique-content-item-actions">
+                                <a href=""><button type="button">Modifier</button></a>
+                            </div>
+                        </div>
+                        <div class="main-box-historique-content-item">
+                            <div class="main-box-historique-content-item-id">
+                                <p>1</p>
+                            </div>
+                            <div class="main-box-historique-content-item-infos">
+                                <p>Antoine Boullanger</p>
+                                <p>RH</p>
+                            </div>
+                            <div class="main-box-historique-content-item-date">
+                                <p>Janvier</p>
+                            </div>
+                            <div class="main-box-historique-content-item-salaires">
+                                <p>7000 €</p>
+                            </div>
+                            <div class="main-box-historique-content-item-dates">
+                                <p>15/01/2023</p>
+                                <p>09:00</p>
+                            </div>
+                            <div class="main-box-historique-content-item-actions">
+                                <a href=""><button type="button">Modifier</button></a>
+                            </div>
+                        </div>
+                        <div class="main-box-historique-content-item">
+                            <div class="main-box-historique-content-item-id">
+                                <p>1</p>
+                            </div>
+                            <div class="main-box-historique-content-item-infos">
+                                <p>Antoine Boullanger</p>
+                                <p>RH</p>
+                            </div>
+                            <div class="main-box-historique-content-item-date">
+                                <p>Janvier</p>
+                            </div>
+                            <div class="main-box-historique-content-item-salaires">
+                                <p>7000 €</p>
+                            </div>
+                            <div class="main-box-historique-content-item-dates">
+                                <p>15/01/2023</p>
+                                <p>09:00</p>
+                            </div>
+                            <div class="main-box-historique-content-item-actions">
+                                <a href=""><button type="button">Modifier</button></a>
+                            </div>
+                        </div>
+                        <div class="main-box-historique-content-item">
+                            <div class="main-box-historique-content-item-id">
+                                <p>1</p>
+                            </div>
+                            <div class="main-box-historique-content-item-infos">
+                                <p>Antoine Boullanger</p>
+                                <p>RH</p>
+                            </div>
+                            <div class="main-box-historique-content-item-date">
+                                <p>Janvier</p>
+                            </div>
+                            <div class="main-box-historique-content-item-salaires">
+                                <p>7000 €</p>
+                            </div>
+                            <div class="main-box-historique-content-item-dates">
+                                <p>15/01/2023</p>
+                                <p>09:00</p>
+                            </div>
+                            <div class="main-box-historique-content-item-actions">
+                                <a href=""><button type="button">Modifier</button></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>

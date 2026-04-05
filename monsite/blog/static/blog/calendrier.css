@@ -1,0 +1,127 @@
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    text-decoration: none;
+}
+body {
+    height: 100vh;
+    width: 100vw;
+    background-image: url("images/fondecran.jpg");
+    background-size: cover;
+}
+header {
+    height: 15vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.header-color {
+    height: 100%;
+    width: 70%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 0 0 30px 30px;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.header-color-titre {
+    font-size: 1.5rem;
+    font-weight: bold;
+    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+}
+.header-color-titre a {
+    color: white;
+}
+main {
+    height: 85vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.main-box {
+    height: 85%;
+    width: 90%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 16px;
+    padding: 16px;
+    box-sizing: border-box;
+}
+.main-box-box {
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+.main-box-box-red {
+    background-color: rgb(218, 8, 8, 0.3);
+}
+.main-box-box-green {
+    background-color: rgb(46, 125, 59, 0.5);
+}
+.main-box-box-black {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+.main-box-box-red .main-box-box-bouton-paye a,
+.main-box-box-black a {
+    pointer-events: none;
+}
+.main-box-box-red .main-box-box-bouton-paye button,
+.main-box-box-black button {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.main-box-box-titre {
+    flex: 1;
+    font-size: 1.2rem;
+    font-weight: bold;
+    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+    color: white;
+    text-align: left;
+}
+.main-box-box-bouton {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: 8px;
+    flex: 1;
+}
+.main-box-box-bouton-paye {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+.main-box-box-bouton-paye a button {
+    background-color: #4caf4f5e;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+}
+
+.main-box-box-bouton-stathistorique {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+.main-box-box-bouton-stathistorique a button {
+    background-color: #2195f361;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+}

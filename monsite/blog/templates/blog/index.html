@@ -1,0 +1,47 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+    <head>
+        <link rel="stylesheet" href="{% static 'blog/index.css' %}" />
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>EasyPay</title>
+    </head>
+    <body>
+        <header>
+            <div class="header-color">
+                <div class="header-color-titre">
+                    <a href="index.html"><h1>EasyPay</h1></a>
+                </div>
+            </div>
+        </header>
+        <main>
+            <div id="main-color">
+                <div class="main-color-content">
+                    <h4 class="main-color-content-titre">Calendrier</h4>
+                    <img class="main-color-content-image" src="{% static 'blog/images/calendrier.png' %}" alt="" />
+                    <p class="main-color-content-paragraphe">Voir le calendrier des payes et payer</p>
+                    <a class="main-color-content-boutton" href="calendrier.html">
+                        <button>Accéder</button>
+                    </a>
+                </div>
+                <div class="main-color-content">
+                    <h4 class="main-color-content-titre">Historique</h4>
+                    <img class="main-color-content-image" src="{% static 'blog/images/Livre.png' %}" alt="" />
+                    <p class="main-color-content-paragraphe">Voir l'historique des payes, les payes effectuées</p>
+                    <a class="main-color-content-boutton" href="historique.html">
+                        <button>Accéder</button>
+                    </a>
+                </div>
+                <div class="main-color-content">
+                    <h4 class="main-color-content-titre">Stats</h4>
+                    <img class="main-color-content-image" src="{% static 'blog/images/Stat.png' %}" alt="" />
+                    <p class="main-color-content-paragraphe">Voir les statistiques des payes en détaille</p>
+                    <a class="main-color-content-boutton" href="stat.html">
+                        <button>Accéder</button>
+                    </a>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>

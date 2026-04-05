@@ -1,13 +1,21 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 
-def home(request):
-    return render(request, 'blog/home.html')
 
-def submit_payroll(request):
-    if request.method == 'POST':
-        # Traiter les données du formulaire
-        return redirect('confirmation')
-    return redirect('home')
+def index(request):
+    return render(request, 'blog/index.html')
 
-def confirmation(request):
-    return render(request, 'blog/confirmation.html')
+
+def calendrier(request):
+    return render(request, 'blog/calendrier.html')
+
+
+def historique(request):
+    return render(request, 'blog/historique.html')
+
+
+def payes(request):
+    return render(request, 'blog/payes.html')
+
+
+def stat(request):
+    return render(request, 'blog/stat.html')
