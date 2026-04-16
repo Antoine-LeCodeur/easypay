@@ -1,14 +1,23 @@
 from decimal import Decimal, InvalidOperation
+from io import BytesIO
 
 from django.db import IntegrityError
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse
 from django.shortcuts import render
 from django.utils import timezone
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
+from django.views.decorators.http import require_POST, require_GET
 
 from .models import Historique, Utilisateur
 import json
+
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import cm
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
 
 
 def index(request):
@@ -195,3 +204,242 @@ def stat(request):
         'salaire_moyen': salaire_moyen
     }
     return render(request, 'blog/stat.html', context)
+
+
+@require_POST
+def telecharger_fiche_paye(request):
+    """Génère et télécharge une fiche de paye professionnelle en PDF"""
+    try:
+        payload = json.loads(request.body or b"{}")
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Donnees invalides."}, status=400)
+
+    utilisateur_id = payload.get("utilisateur_id")
+    if not utilisateur_id:
+        return JsonResponse({"error": "Utilisateur requis."}, status=400)
+
+    try:
+        utilisateur_id = int(utilisateur_id)
+    except (TypeError, ValueError):
+        return JsonResponse({"error": "Utilisateur invalide."}, status=400)
+
+    try:
+        utilisateur = Utilisateur.objects.get(id=utilisateur_id)
+    except Utilisateur.DoesNotExist:
+        return JsonResponse({"error": "Utilisateur introuvable."}, status=404)
+
+    prime = float(payload.get("prime", 0))
+    heures_sup = float(payload.get("heures_sup", 0))
+
+    # Calcul du salaire
+    salaire_base = float(utilisateur.paye)
+    taux_heure_sup = 100
+    salaire_hs = heures_sup * taux_heure_sup
+    salaire_brut = salaire_base + prime + salaire_hs
+    
+    # Cotisations sociales (approximation France)
+    cotisation_salariale = salaire_brut * 0.08  # 8% approximation
+    salaire_net = salaire_brut - cotisation_salariale
+
+    # Créer le PDF
+    buffer = BytesIO()
+    
+    # Config page
+    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
+    
+    doc = SimpleDocTemplate(
+        buffer, 
+        pagesize=A4,
+        rightMargin=0.8*cm,
+        leftMargin=0.8*cm,
+        topMargin=0.8*cm,
+        bottomMargin=0.8*cm
+    )
+    
+    styles = getSampleStyleSheet()
+    elements = []
+    
+    # ===== EN-TÊTE =====
+    header_style = ParagraphStyle(
+        'HeaderStyle',
+        parent=styles['Normal'],
+        fontSize=10,
+        textColor=colors.HexColor('#1f4788'),
+        fontName='Helvetica-Bold',
+        spaceAfter=3,
+    )
+    
+    # Logo/Titre entreprise
+    elements.append(Paragraph("<b>EasyPay SARL</b>", ParagraphStyle(
+        'CompanyName',
+        parent=styles['Normal'],
+        fontSize=16,
+        textColor=colors.HexColor('#1f4788'),
+        fontName='Helvetica-Bold',
+    )))
+    elements.append(Paragraph("123 Rue de la Paie, 75000 Paris<br/>Tél: 01.23.45.67.89 | Email: contact@easypay.fr", 
+        ParagraphStyle('CompanyInfo', parent=styles['Normal'], fontSize=8, alignment=TA_CENTER)))
+    elements.append(Spacer(1, 0.5*cm))
+    
+    # Ligne de séparation
+    hr_table = Table([[''], ], colWidths=[19*cm])
+    hr_table.setStyle(TableStyle([
+        ('LINEABOVE', (0, 0), (0, 0), 2, colors.HexColor('#1f4788')),
+    ]))
+    elements.append(hr_table)
+    elements.append(Spacer(1, 0.3*cm))
+    
+    # Titre
+    elements.append(Paragraph("<b>BULLETIN DE SALAIRE</b>", ParagraphStyle(
+        'Title',
+        parent=styles['Normal'],
+        fontSize=14,
+        textColor=colors.HexColor('#1f4788'),
+        fontName='Helvetica-Bold',
+        alignment=TA_CENTER,
+    )))
+    elements.append(Spacer(1, 0.3*cm))
+    
+    # ===== INFORMATIONS EMPLOYÉ ET PÉRIODE =====
+    today = timezone.localdate()
+    mois_noms = {
+        1: "Janvier", 2: "Février", 3: "Mars", 4: "Avril", 5: "Mai", 6: "Juin",
+        7: "Juillet", 8: "Août", 9: "Septembre", 10: "Octobre", 11: "Novembre", 12: "Décembre"
+    }
+    
+    info_data = [
+        ["Nom et Prénom:", utilisateur.nomprenom, "", "Période:", f"{mois_noms.get(today.month)} {today.year}"],
+        ["Service:", utilisateur.service, "", "Date émission:", today.strftime("%d/%m/%Y")],
+        ["Email:", utilisateur.mail, "", ""],
+    ]
+    
+    info_table = Table(info_data, colWidths=[3*cm, 5*cm, 1*cm, 3.5*cm, 5*cm])
+    info_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('TEXTCOLOR', (0, 0), (0, -1), colors.HexColor('#1f4788')),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+    ]))
+    elements.append(info_table)
+    elements.append(Spacer(1, 0.4*cm))
+    
+    # ===== TABLEAU RÉMUNÉRATION =====
+    elements.append(Paragraph("<b>DÉTAIL DU SALAIRE</b>", ParagraphStyle(
+        'SectionTitle',
+        parent=styles['Normal'],
+        fontSize=11,
+        textColor=colors.HexColor('#1f4788'),
+        fontName='Helvetica-Bold',
+    )))
+    elements.append(Spacer(1, 0.15*cm))
+    
+    remu_data = [
+        ["ÉLÉMENT", "QUANTITÉ", "TAUX", "MONTANT"],
+        ["Salaire de base", "1", f"{salaire_base:.2f} €", f"{salaire_base:.2f} €"],
+        ["Heures supplémentaires", f"{heures_sup:.2f}h", f"{taux_heure_sup:.2f} €/h", f"{salaire_hs:.2f} €"],
+        ["Prime", "1", "-", f"{prime:.2f} €"],
+        ["", "", "", ""],
+        ["TOTAL BRUT", "", "", f"{salaire_brut:.2f} €"],
+    ]
+    
+    remu_table = Table(remu_data, colWidths=[6*cm, 3.5*cm, 3*cm, 3*cm])
+    remu_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1f4788')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
+        ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTNAME', (0, 5), (-1, 5), 'Helvetica-Bold'),
+        ('BACKGROUND', (0, 5), (-1, 5), colors.HexColor('#e8f0f8')),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('GRID', (0, 0), (-1, 4), 1, colors.HexColor('#cccccc')),
+        ('GRID', (0, 5), (-1, 5), 1, colors.HexColor('#1f4788')),
+        ('LINEABOVE', (0, 4), (-1, 4), 1, colors.HexColor('#cccccc')),
+    ]))
+    elements.append(remu_table)
+    elements.append(Spacer(1, 0.3*cm))
+    
+    # ===== TABLEAU RETENUES =====
+    elements.append(Paragraph("<b>RETENUES ET COTISATIONS</b>", ParagraphStyle(
+        'SectionTitle',
+        parent=styles['Normal'],
+        fontSize=11,
+        textColor=colors.HexColor('#1f4788'),
+        fontName='Helvetica-Bold',
+    )))
+    elements.append(Spacer(1, 0.15*cm))
+    
+    retenues_data = [
+        ["DÉSIGNATION", "BASE", "TAUX", "MONTANT"],
+        ["Cotisations sociales salariales", f"{salaire_brut:.2f} €", "8.0%", f"{cotisation_salariale:.2f} €"],
+        ["", "", "", ""],
+        ["TOTAL RETENUES", "", "", f"{cotisation_salariale:.2f} €"],
+    ]
+    
+    retenues_table = Table(retenues_data, colWidths=[6*cm, 3.5*cm, 3*cm, 3*cm])
+    retenues_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#ff6b6b')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
+        ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTNAME', (0, 3), (-1, 3), 'Helvetica-Bold'),
+        ('BACKGROUND', (0, 3), (-1, 3), colors.HexColor('#ffe8e8')),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('GRID', (0, 0), (-1, 2), 1, colors.HexColor('#cccccc')),
+        ('GRID', (0, 3), (-1, 3), 1, colors.HexColor('#ff6b6b')),
+        ('LINEABOVE', (0, 2), (-1, 2), 1, colors.HexColor('#cccccc')),
+    ]))
+    elements.append(retenues_table)
+    elements.append(Spacer(1, 0.3*cm))
+    
+    # ===== RÉSUMÉ FINAL =====
+    resume_data = [
+        ["Salaire brut", f"{salaire_brut:.2f} €", colors.HexColor('#1f4788')],
+        ["Retenues", f"- {cotisation_salariale:.2f} €", colors.red],
+        ["SALAIRE NET À PAYER", f"{salaire_net:.2f} €", colors.HexColor('#2ecc71')],
+    ]
+    
+    resume_table_data = []
+    for row in resume_data:
+        resume_table_data.append(row[:2])
+    
+    resume_table = Table(resume_table_data, colWidths=[14*cm, 4*cm])
+    resume_styles = [
+        ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
+        ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 11),
+        ('TOPPADDING', (0, 0), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#e8f0f8')),
+        ('BACKGROUND', (0, 1), (-1, 1), colors.HexColor('#ffe8e8')),
+        ('BACKGROUND', (0, 2), (-1, 2), colors.HexColor('#e8f8e8')),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#1f4788')),
+    ]
+    resume_table.setStyle(TableStyle(resume_styles))
+    elements.append(resume_table)
+    
+    elements.append(Spacer(1, 0.5*cm))
+    
+    # ===== PIED DE PAGE =====
+    elements.append(Paragraph("<i>Ce bulletin de salaire a été généré par EasyPay. Les cotisations affichées sont approximatives.</i>", 
+        ParagraphStyle('Footer', parent=styles['Normal'], fontSize=8, textColor=colors.grey, alignment=TA_CENTER)))
+    
+    # Générer le PDF
+    doc.build(elements)
+    buffer.seek(0)
+    
+    # Retourner le PDF en téléchargement
+    nom_fichier = f"Fiche_Paye_{utilisateur.nomprenom}_{today.month}_{today.year}.pdf"
+    response = FileResponse(buffer, as_attachment=True, filename=nom_fichier)
+    response['Content-Type'] = 'application/pdf'
+    return response

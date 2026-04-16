@@ -211,6 +211,65 @@
                 return "";
             }
 
+            // Événement pour le bouton Télécharger
+            boutonTelecharger.addEventListener("click", async function (event) {
+                event.preventDefault();
+
+                if (!utilisateurSelectionne) {
+                    alert("Veuillez sélectionner un employé.");
+                    return;
+                }
+
+                const prime = lireNombre(primeInput);
+                const heuresSup = lireNombre(heureSupInput);
+                const utilisateurId = Number(nomSelect.value);
+
+                if (!Number.isFinite(utilisateurId)) {
+                    alert("Employé invalide.");
+                    return;
+                }
+
+                boutonTelecharger.disabled = true;
+
+                try {
+                    const response = await fetch("{% url 'telecharger_fiche_paye' %}", {
+                        method: "POST",
+                        credentials: "same-origin",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": getCookie("csrftoken"),
+                        },
+                        body: JSON.stringify({
+                            utilisateur_id: utilisateurId,
+                            prime: prime,
+                            heures_sup: heuresSup,
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        const message = await response.text();
+                        alert("Erreur lors de la génération du PDF.");
+                        return;
+                    }
+
+                    // Télécharger le fichier PDF
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `Fiche_Paye_${utilisateurSelectionne.nomprenom}_${new Date().getMonth() + 1}_${new Date().getFullYear()}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } catch (error) {
+                    alert("Erreur lors du téléchargement du PDF.");
+                    console.error(error);
+                } finally {
+                    mettreAJourBoutons(Boolean(utilisateurSelectionne));
+                }
+            });
+
             // Charger tous les noms au démarrage
             mettreAJourNoms("");
         </script>
