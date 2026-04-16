@@ -19,26 +19,26 @@
             <div class="main-box">
                 <div class="main-box-stats">
                     <div class="main-box-stats-under">
-                        <div class="main-box-stats-under-titre"><h6>Prime de Avril :</h6></div>
-                        <div class="main-box-stats-under-p"><p>500 €</p></div>
+                        <div class="main-box-stats-under-titre"><h6>Prime de {{ mois }} :</h6></div>
+                        <div class="main-box-stats-under-p"><p>{{ prime_totale }} €</p></div>
                     </div>
                     <div class="main-box-stats-under">
-                        <div class="main-box-stats-under-titre"><h6>Heures sup de Avril :</h6></div>
-                        <div class="main-box-stats-under-p"><p>10 h</p></div>
+                        <div class="main-box-stats-under-titre"><h6>Heures sup de {{ mois }} :</h6></div>
+                        <div class="main-box-stats-under-p"><p>{{ heures_sup_totale }} h</p></div>
                     </div>
                     <div class="main-box-stats-under">
-                        <div class="main-box-stats-under-titre"><h6>Total de Avril :</h6></div>
-                        <div class="main-box-stats-under-p"><p>1000 €</p></div>
+                        <div class="main-box-stats-under-titre"><h6>Total de {{ mois }} :</h6></div>
+                        <div class="main-box-stats-under-p"><p>{{ total_salaire }} €</p></div>
                     </div>
                 </div>
                 <div class="main-box-stats">
                     <div class="main-box-stats-under2">
-                        <div class="main-box-stats-under-titre"><h6>Payes de Avril :</h6></div>
-                        <div class="main-box-stats-under-p"><p>60/100</p></div>
+                        <div class="main-box-stats-under-titre"><h6>Payes de {{ mois }} :</h6></div>
+                        <div class="main-box-stats-under-p"><p>{{ total_payes }}/100</p></div>
                     </div>
                     <div class="main-box-stats-under2">
-                        <div class="main-box-stats-under-titre"><h6>Total payé :</h6></div>
-                        <div class="main-box-stats-under-p"><p>1800 €</p></div>
+                        <div class="main-box-stats-under-titre"><h6>Salaire moyen :</h6></div>
+                        <div class="main-box-stats-under-p"><p>{{ salaire_moyen|floatformat:2 }} €</p></div>
                     </div>
                 </div>
             </div>

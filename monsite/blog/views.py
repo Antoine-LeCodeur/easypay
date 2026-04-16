@@ -112,4 +112,51 @@ def enregistrer_paye(request):
 
 
 def stat(request):
-    return render(request, 'blog/stat.html')
+    mois_param = request.GET.get('mois')
+    today = timezone.localdate()
+    
+    # Déterminer le mois à afficher
+    if mois_param:
+        try:
+            mois = int(mois_param)
+            if mois < 1 or mois > 12:
+                mois = today.month
+        except (ValueError, TypeError):
+            mois = today.month
+    else:
+        mois = today.month
+    
+    # Noms des mois en français
+    mois_noms = {
+        1: "Janvier", 2: "Février", 3: "Mars", 4: "Avril", 5: "Mai", 6: "Juin",
+        7: "Juillet", 8: "Août", 9: "Septembre", 10: "Octobre", 11: "Novembre", 12: "Décembre"
+    }
+    
+    # Récupérer les statistiques du mois
+    historiques = Historique.objects.filter(mois=mois, annee=today.year)
+    
+    # Calculer les statistiques
+    prime_totale = sum(Decimal(str(h.prime)) for h in historiques)
+    heures_sup_totale = sum(Decimal(str(h.heures_sup)) for h in historiques)
+    total_payes = historiques.count()
+    
+    # Calculer le salaire total (somme des salaires de base + primes + heures sup)
+    total_salaire = Decimal('0')
+    for h in historiques:
+        salaire_base = Decimal(str(h.utilisateur.paye))
+        prime = Decimal(str(h.prime))
+        # Supposer un taux horaire de 15€ par heure supplémentaire
+        heures_sup_value = Decimal(str(h.heures_sup)) * Decimal('15')
+        total_salaire += salaire_base + prime + heures_sup_value
+    
+    salaire_moyen = total_salaire / total_payes if total_payes > 0 else Decimal('0')
+    
+    context = {
+        'mois': mois_noms.get(mois, 'Mois inconnu'),
+        'prime_totale': prime_totale,
+        'heures_sup_totale': heures_sup_totale,
+        'total_payes': total_payes,
+        'total_salaire': total_salaire,
+        'salaire_moyen': salaire_moyen
+    }
+    return render(request, 'blog/stat.html', context)
