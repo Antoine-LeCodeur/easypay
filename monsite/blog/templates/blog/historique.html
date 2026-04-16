@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_filters %}
 <!doctype html>
 <html lang="en">
     <head>
@@ -22,39 +23,42 @@
                         <div id="main-box-filtres-box-titre">
                             <h4>Filtres</h4>
                         </div>
-                        <form id="main-box-filtres-box-form" action="">
-                            <label for="choix">Nom : </label>
-                            <select name="choix" id="choix">
-                                <option value="tous">Tous</option>
-                                <option value="payes">Antoine Boullanger</option>
-                                <option value="calendrier">Kylian Mbappé</option>
-                                <option value="stats">Antoine Griezmann</option>
+                        <form id="main-box-filtres-box-form" method="GET" action="">
+                            <label for="nom">Nom : </label>
+                            <select name="nom" id="nom">
+                                <option value="">Tous</option>
+                                {% for nom in noms %}
+                                    <option value="{{ nom }}" {% if nom == nom_filter %}selected{% endif %}>{{ nom }}</option>
+                                {% endfor %}
                             </select>
-                            <label for="services">Services : </label>
-                            <select name="services" id="services">
-                                <option value="tous">Tous</option>
-                                <option value="payes">RH</option>
-                                <option value="calendrier">Direction</option>
-                                <option value="stats">Prod</option>
+                            
+                            <label for="service">Services : </label>
+                            <select name="service" id="service">
+                                <option value="">Tous</option>
+                                {% for service in services %}
+                                    <option value="{{ service }}" {% if service == service_filter %}selected{% endif %}>{{ service }}</option>
+                                {% endfor %}
                             </select>
-                            <label for="date">Date : </label>
-                            <select name="date" id="date">
-                                <option value="toutes">Toutes</option>
-                                <option value="tous">Janvier</option>
-                                <option value="tous">Février</option>
-                                <option value="tous">Mars</option>
-                                <option value="tous">Avril</option>
-                                <option value="tous">Mai</option>
-                                <option value="tous">Juin</option>
-                                <option value="tous">Juillet</option>
-                                <option value="tous">Août</option>
-                                <option value="tous">Septembre</option>
-                                <option value="tous">Octobre</option>
-                                <option value="tous">Novembre</option>
-                                <option value="tous">Décembre</option>
+                            
+                            <label for="mois">Mois : </label>
+                            <select name="mois" id="mois">
+                                <option value="">Tous</option>
+                                <option value="1" {% if mois_filter == '1' %}selected{% endif %}>Janvier</option>
+                                <option value="2" {% if mois_filter == '2' %}selected{% endif %}>Février</option>
+                                <option value="3" {% if mois_filter == '3' %}selected{% endif %}>Mars</option>
+                                <option value="4" {% if mois_filter == '4' %}selected{% endif %}>Avril</option>
+                                <option value="5" {% if mois_filter == '5' %}selected{% endif %}>Mai</option>
+                                <option value="6" {% if mois_filter == '6' %}selected{% endif %}>Juin</option>
+                                <option value="7" {% if mois_filter == '7' %}selected{% endif %}>Juillet</option>
+                                <option value="8" {% if mois_filter == '8' %}selected{% endif %}>Août</option>
+                                <option value="9" {% if mois_filter == '9' %}selected{% endif %}>Septembre</option>
+                                <option value="10" {% if mois_filter == '10' %}selected{% endif %}>Octobre</option>
+                                <option value="11" {% if mois_filter == '11' %}selected{% endif %}>Novembre</option>
+                                <option value="12" {% if mois_filter == '12' %}selected{% endif %}>Décembre</option>
                             </select>
+                            
                             <button type="submit">Afficher</button>
-                            <button type="submit">Reinitialiser</button>
+                            <button type="button" onclick="resetFilters()">Reinitialiser</button>
                         </form>
                     </div>
                 </div>
@@ -63,185 +67,46 @@
                         <h4>Historique des payes</h4>
                     </div>
                     <div id="main-box-historique-content">
+                        {% for historique in historiques %}
                         <div class="main-box-historique-content-item">
                             <div class="main-box-historique-content-item-id">
-                                <p>1</p>
+                                <p>{{ historique.id }}</p>
                             </div>
                             <div class="main-box-historique-content-item-infos">
-                                <p>Antoine Boullanger</p>
-                                <p>RH</p>
+                                <p>{{ historique.utilisateur.nomprenom }}</p>
+                                <p>{{ historique.utilisateur.service }}</p>
                             </div>
                             <div class="main-box-historique-content-item-date">
-                                <p>Janvier</p>
+                                <p>{{ historique.mois|mois_name }}</p>
                             </div>
                             <div class="main-box-historique-content-item-salaires">
-                                <p>7000 €</p>
+                                <p>{{ historique|salaire_total }} €</p>
                             </div>
                             <div class="main-box-historique-content-item-dates">
-                                <p>15/01/2023</p>
-                                <p>09:00</p>
+                                <p>{{ historique.date|date:"d/m/Y" }}</p>
+                                <p>{{ historique.heure|time:"H:i" }}</p>
                             </div>
                             <div class="main-box-historique-content-item-actions">
                                 <a href=""><button type="button">Modifier</button></a>
                             </div>
                         </div>
-                        <div class="main-box-historique-content-item">
-                            <div class="main-box-historique-content-item-id">
-                                <p>1</p>
-                            </div>
-                            <div class="main-box-historique-content-item-infos">
-                                <p>Antoine Boullanger</p>
-                                <p>RH</p>
-                            </div>
-                            <div class="main-box-historique-content-item-date">
-                                <p>Janvier</p>
-                            </div>
-                            <div class="main-box-historique-content-item-salaires">
-                                <p>7000 €</p>
-                            </div>
-                            <div class="main-box-historique-content-item-dates">
-                                <p>15/01/2023</p>
-                                <p>09:00</p>
-                            </div>
-                            <div class="main-box-historique-content-item-actions">
-                                <a href=""><button type="button">Modifier</button></a>
-                            </div>
+                        {% empty %}
+                        <div style="padding: 20px; text-align: center;">
+                            <p>Aucun résultat trouvé.</p>
                         </div>
-                        <div class="main-box-historique-content-item">
-                            <div class="main-box-historique-content-item-id">
-                                <p>1</p>
-                            </div>
-                            <div class="main-box-historique-content-item-infos">
-                                <p>Antoine Boullanger</p>
-                                <p>RH</p>
-                            </div>
-                            <div class="main-box-historique-content-item-date">
-                                <p>Janvier</p>
-                            </div>
-                            <div class="main-box-historique-content-item-salaires">
-                                <p>7000 €</p>
-                            </div>
-                            <div class="main-box-historique-content-item-dates">
-                                <p>15/01/2023</p>
-                                <p>09:00</p>
-                            </div>
-                            <div class="main-box-historique-content-item-actions">
-                                <a href=""><button type="button">Modifier</button></a>
-                            </div>
-                        </div>
-                        <div class="main-box-historique-content-item">
-                            <div class="main-box-historique-content-item-id">
-                                <p>1</p>
-                            </div>
-                            <div class="main-box-historique-content-item-infos">
-                                <p>Antoine Boullanger</p>
-                                <p>RH</p>
-                            </div>
-                            <div class="main-box-historique-content-item-date">
-                                <p>Janvier</p>
-                            </div>
-                            <div class="main-box-historique-content-item-salaires">
-                                <p>7000 €</p>
-                            </div>
-                            <div class="main-box-historique-content-item-dates">
-                                <p>15/01/2023</p>
-                                <p>09:00</p>
-                            </div>
-                            <div class="main-box-historique-content-item-actions">
-                                <a href=""><button type="button">Modifier</button></a>
-                            </div>
-                        </div>
-                        <div class="main-box-historique-content-item">
-                            <div class="main-box-historique-content-item-id">
-                                <p>1</p>
-                            </div>
-                            <div class="main-box-historique-content-item-infos">
-                                <p>Antoine Boullanger</p>
-                                <p>RH</p>
-                            </div>
-                            <div class="main-box-historique-content-item-date">
-                                <p>Janvier</p>
-                            </div>
-                            <div class="main-box-historique-content-item-salaires">
-                                <p>7000 €</p>
-                            </div>
-                            <div class="main-box-historique-content-item-dates">
-                                <p>15/01/2023</p>
-                                <p>09:00</p>
-                            </div>
-                            <div class="main-box-historique-content-item-actions">
-                                <a href=""><button type="button">Modifier</button></a>
-                            </div>
-                        </div>
-                        <div class="main-box-historique-content-item">
-                            <div class="main-box-historique-content-item-id">
-                                <p>1</p>
-                            </div>
-                            <div class="main-box-historique-content-item-infos">
-                                <p>Antoine Boullanger</p>
-                                <p>RH</p>
-                            </div>
-                            <div class="main-box-historique-content-item-date">
-                                <p>Janvier</p>
-                            </div>
-                            <div class="main-box-historique-content-item-salaires">
-                                <p>7000 €</p>
-                            </div>
-                            <div class="main-box-historique-content-item-dates">
-                                <p>15/01/2023</p>
-                                <p>09:00</p>
-                            </div>
-                            <div class="main-box-historique-content-item-actions">
-                                <a href=""><button type="button">Modifier</button></a>
-                            </div>
-                        </div>
-                        <div class="main-box-historique-content-item">
-                            <div class="main-box-historique-content-item-id">
-                                <p>1</p>
-                            </div>
-                            <div class="main-box-historique-content-item-infos">
-                                <p>Antoine Boullanger</p>
-                                <p>RH</p>
-                            </div>
-                            <div class="main-box-historique-content-item-date">
-                                <p>Janvier</p>
-                            </div>
-                            <div class="main-box-historique-content-item-salaires">
-                                <p>7000 €</p>
-                            </div>
-                            <div class="main-box-historique-content-item-dates">
-                                <p>15/01/2023</p>
-                                <p>09:00</p>
-                            </div>
-                            <div class="main-box-historique-content-item-actions">
-                                <a href=""><button type="button">Modifier</button></a>
-                            </div>
-                        </div>
-                        <div class="main-box-historique-content-item">
-                            <div class="main-box-historique-content-item-id">
-                                <p>1</p>
-                            </div>
-                            <div class="main-box-historique-content-item-infos">
-                                <p>Antoine Boullanger</p>
-                                <p>RH</p>
-                            </div>
-                            <div class="main-box-historique-content-item-date">
-                                <p>Janvier</p>
-                            </div>
-                            <div class="main-box-historique-content-item-salaires">
-                                <p>7000 €</p>
-                            </div>
-                            <div class="main-box-historique-content-item-dates">
-                                <p>15/01/2023</p>
-                                <p>09:00</p>
-                            </div>
-                            <div class="main-box-historique-content-item-actions">
-                                <a href=""><button type="button">Modifier</button></a>
-                            </div>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
         </main>
+        <script>
+            function resetFilters() {
+                // Réinitialiser tous les selects à la première option (Tous)
+                document.getElementById('nom').value = '';
+                document.getElementById('service').value = '';
+                document.getElementById('mois').value = '';
+            }
+        </script>
     </body>
 </html>
+                           

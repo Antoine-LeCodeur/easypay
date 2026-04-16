@@ -20,7 +20,42 @@ def calendrier(request):
 
 
 def historique(request):
-    return render(request, 'blog/historique.html')
+    # Récupérer les paramètres de filtrage
+    nom_filter = request.GET.get('nom', '')
+    service_filter = request.GET.get('service', '')
+    mois_filter = request.GET.get('mois', '')
+    
+    # Récupérer tous les utilisateurs et services pour les selects
+    utilisateurs = Utilisateur.objects.all()
+    services = Utilisateur.objects.values_list('service', flat=True).distinct()
+    noms = Utilisateur.objects.values_list('nomprenom', flat=True).distinct().order_by('nomprenom')
+    
+    # Récupérer les historiques
+    historiques = Historique.objects.select_related('utilisateur').all()
+    
+    # Appliquer les filtres
+    if nom_filter and nom_filter != '':
+        historiques = historiques.filter(utilisateur__nomprenom=nom_filter)
+    
+    if service_filter and service_filter != '':
+        historiques = historiques.filter(utilisateur__service=service_filter)
+    
+    if mois_filter and mois_filter != '' and mois_filter.isdigit():
+        historiques = historiques.filter(mois=int(mois_filter))
+    
+    # Ordonner par date décroissante
+    historiques = historiques.order_by('-date', '-heure')
+    
+    context = {
+        'historiques': historiques,
+        'utilisateurs': utilisateurs,
+        'services': services,
+        'noms': noms,
+        'nom_filter': nom_filter,
+        'service_filter': service_filter,
+        'mois_filter': mois_filter
+    }
+    return render(request, 'blog/historique.html', context)
 
 
 @ensure_csrf_cookie
