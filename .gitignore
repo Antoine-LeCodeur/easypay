@@ -16,5 +16,7 @@ htmlcov/
 .mypy_cache/
 .DS_Store
 Thumbs.db
+db.sqlite3
+*.log
 .env
 .env.local
