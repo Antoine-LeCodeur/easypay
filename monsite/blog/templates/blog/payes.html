@@ -24,16 +24,13 @@
 
                             <select name="services" id="services">
                                 <option value="tous">Tous</option>
-                                <option value="payes">RH</option>
-                                <option value="calendrier">Direction</option>
-                                <option value="stats">Prod</option>
+                                {% for service in services %}
+                                    <option value="{{ service }}">{{ service }}</option>
+                                {% endfor %}
                             </select>
                             <label for="choix">Nom : </label>
                             <select name="choix" id="choix">
-                                <option value="tous">Tous</option>
-                                <option value="payes">Antoine Boullanger</option>
-                                <option value="calendrier">Kylian Mbappé</option>
-                                <option value="stats">Antoine Griezmann</option>
+                                <option value="">Sélectionnez un nom</option>
                             </select>
                             <label for="prime">Prime : </label>
                             <input type="number" name="prime" id="prime" placeholder="Montant de la prime" />
@@ -41,7 +38,7 @@
                             <input type="number" name="heure-sup" id="heure-sup" placeholder="Nombre d'heures supplémentaires" />
                         </form>
                         <div class="main-box-box-input-salaire">
-                            <h4>Salaires : 1500 €</h4>
+                            <h4>Salaires : <span id="salaire-display">-</span> €</h4>
                         </div>
                     </div>
                     <div class="main-box-box-button">
@@ -52,5 +49,52 @@
                 </div>
             </div>
         </main>
+        <script>
+            const servicesSelect = document.getElementById('services');
+            const noinSelect = document.getElementById('choix');
+            const salaireDisplay = document.getElementById('salaire-display');
+            
+            // Charger les utilisateurs initiaux (tous)
+            loadUtilisateurs('tous');
+            
+            // Écouter le changement du service
+            servicesSelect.addEventListener('change', function() {
+                loadUtilisateurs(this.value);
+            });
+            
+            // Écouter le changement du nom
+            noinSelect.addEventListener('change', function() {
+                if (this.value) {
+                    loadUtilisateurDetail(this.value);
+                } else {
+                    salaireDisplay.textContent = '-';
+                }
+            });
+            
+            function loadUtilisateurs(service) {
+                fetch(`/blog/api/utilisateurs-by-service/?service=${service}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        noinSelect.innerHTML = '<option value="">Sélectionnez un nom</option>';
+                        data.forEach(utilisateur => {
+                            const option = document.createElement('option');
+                            option.value = utilisateur.id;
+                            option.textContent = utilisateur.nomprenom;
+                            noinSelect.appendChild(option);
+                        });
+                        salaireDisplay.textContent = '-';
+                    })
+                    .catch(error => console.error('Erreur:', error));
+            }
+            
+            function loadUtilisateurDetail(utilisateurId) {
+                fetch(`/blog/api/utilisateur-detail/?id=${utilisateurId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        salaireDisplay.textContent = data.paye;
+                    })
+                    .catch(error => console.error('Erreur:', error));
+            }
+        </script>
     </body>
 </html>
