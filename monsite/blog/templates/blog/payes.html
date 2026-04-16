@@ -23,7 +23,7 @@
                             <label for="">Service :</label>
 
                             <select name="services" id="services">
-                                <option value="tous">Tous</option>
+                                <option value="">Tous les services</option>
                                 {% for service in services %}
                                     <option value="{{ service }}">{{ service }}</option>
                                 {% endfor %}
@@ -49,52 +49,52 @@
                 </div>
             </div>
         </main>
+        <div id="utilisateurs-data" data-utilisateurs="{{ utilisateurs_json }}"></div>
         <script>
+            const utilisateursList = JSON.parse(document.getElementById('utilisateurs-data').getAttribute('data-utilisateurs'));
+            
             const servicesSelect = document.getElementById('services');
-            const noinSelect = document.getElementById('choix');
+            const nomSelect = document.getElementById('choix');
             const salaireDisplay = document.getElementById('salaire-display');
             
-            // Charger les utilisateurs initiaux (tous)
-            loadUtilisateurs('tous');
-            
-            // Écouter le changement du service
+            // Mettre à jour les noms quand le service change
             servicesSelect.addEventListener('change', function() {
-                loadUtilisateurs(this.value);
+                mettreAJourNoms(this.value);
             });
             
-            // Écouter le changement du nom
-            noinSelect.addEventListener('change', function() {
+            // Mettre à jour le salaire quand le nom change
+            nomSelect.addEventListener('change', function() {
                 if (this.value) {
-                    loadUtilisateurDetail(this.value);
+                    const user = utilisateursList.find(u => u.id == this.value);
+                    if (user) {
+                        salaireDisplay.textContent = user.paye;
+                    }
                 } else {
                     salaireDisplay.textContent = '-';
                 }
             });
             
-            function loadUtilisateurs(service) {
-                fetch(`/blog/api/utilisateurs-by-service/?service=${service}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        noinSelect.innerHTML = '<option value="">Sélectionnez un nom</option>';
-                        data.forEach(utilisateur => {
-                            const option = document.createElement('option');
-                            option.value = utilisateur.id;
-                            option.textContent = utilisateur.nomprenom;
-                            noinSelect.appendChild(option);
-                        });
-                        salaireDisplay.textContent = '-';
-                    })
-                    .catch(error => console.error('Erreur:', error));
+            function mettreAJourNoms(serviceFiltre) {
+                nomSelect.innerHTML = '<option value="">Sélectionnez un nom</option>';
+                salaireDisplay.textContent = '-';
+                
+                // Filtrer les utilisateurs par service
+                let utilisateursFiltres = utilisateursList;
+                if (serviceFiltre) {
+                    utilisateursFiltres = utilisateursList.filter(u => u.service === serviceFiltre);
+                }
+                
+                // Ajouter les options
+                utilisateursFiltres.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = user.nomprenom;
+                    nomSelect.appendChild(option);
+                });
             }
             
-            function loadUtilisateurDetail(utilisateurId) {
-                fetch(`/blog/api/utilisateur-detail/?id=${utilisateurId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        salaireDisplay.textContent = data.paye;
-                    })
-                    .catch(error => console.error('Erreur:', error));
-            }
+            // Charger tous les noms au démarrage
+            mettreAJourNoms('');
         </script>
     </body>
 </html>

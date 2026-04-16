@@ -1,6 +1,7 @@
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.core import serializers
 from .models import Utilisateur
+import json
 
 
 def index(request):
@@ -19,22 +20,8 @@ def payes(request):
     utilisateurs = Utilisateur.objects.all()
     services = Utilisateur.objects.values_list('service', flat=True).distinct()
     
-    context = {
-        'utilisateurs': utilisateurs,
-        'services': services
-    }
-    return render(request, 'blog/payes.html', context)
-
-
-def get_utilisateurs_by_service(request):
-    service = request.GET.get('service', 'tous')
-    
-    if service == 'tous':
-        utilisateurs = Utilisateur.objects.all()
-    else:
-        utilisateurs = Utilisateur.objects.filter(service=service)
-    
-    data = [
+    # Convertir les utilisateurs en JSON
+    utilisateurs_json = json.dumps([
         {
             'id': u.id,
             'nomprenom': u.nomprenom,
@@ -42,24 +29,14 @@ def get_utilisateurs_by_service(request):
             'paye': str(u.paye)
         }
         for u in utilisateurs
-    ]
-    return JsonResponse(data, safe=False)
-
-
-def get_utilisateur_detail(request):
-    utilisateur_id = request.GET.get('id')
+    ])
     
-    try:
-        utilisateur = Utilisateur.objects.get(id=utilisateur_id)
-        data = {
-            'nomprenom': utilisateur.nomprenom,
-            'service': utilisateur.service,
-            'mail': utilisateur.mail,
-            'paye': str(utilisateur.paye)
-        }
-        return JsonResponse(data)
-    except Utilisateur.DoesNotExist:
-        return JsonResponse({'error': 'Utilisateur non trouvé'}, status=404)
+    context = {
+        'utilisateurs': utilisateurs,
+        'services': services,
+        'utilisateurs_json': utilisateurs_json
+    }
+    return render(request, 'blog/payes.html', context)
 
 
 def stat(request):
