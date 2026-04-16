@@ -25,7 +25,7 @@
                             <select name="services" id="services">
                                 <option value="">Tous les services</option>
                                 {% for service in services %}
-                                    <option value="{{ service }}">{{ service }}</option>
+                                <option value="{{ service }}">{{ service }}</option>
                                 {% endfor %}
                             </select>
                             <label for="choix">Nom : </label>
@@ -51,50 +51,98 @@
         </main>
         <div id="utilisateurs-data" data-utilisateurs="{{ utilisateurs_json }}"></div>
         <script>
-            const utilisateursList = JSON.parse(document.getElementById('utilisateurs-data').getAttribute('data-utilisateurs'));
-            
-            const servicesSelect = document.getElementById('services');
-            const nomSelect = document.getElementById('choix');
-            const salaireDisplay = document.getElementById('salaire-display');
-            
+            const utilisateursList = JSON.parse(document.getElementById("utilisateurs-data").getAttribute("data-utilisateurs"));
+
+            const servicesSelect = document.getElementById("services");
+            const nomSelect = document.getElementById("choix");
+            const primeInput = document.getElementById("prime");
+            const heureSupInput = document.getElementById("heure-sup");
+            const salaireDisplay = document.getElementById("salaire-display");
+            const boutonTelecharger = document.getElementById("main-box-box-button-telecharger");
+            const boutonEnvoyer = document.getElementById("main-box-box-button-envoyer");
+            const boutonEnregistrer = document.getElementById("main-box-box-button-enregistrer");
+            const salaireFormatter = new Intl.NumberFormat("fr-FR", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            });
+            const TAUX_HEURE_SUP = 100;
+
+            let utilisateurSelectionne = null;
+
             // Mettre à jour les noms quand le service change
-            servicesSelect.addEventListener('change', function() {
+            servicesSelect.addEventListener("change", function () {
                 mettreAJourNoms(this.value);
             });
-            
+
             // Mettre à jour le salaire quand le nom change
-            nomSelect.addEventListener('change', function() {
+            nomSelect.addEventListener("change", function () {
                 if (this.value) {
-                    const user = utilisateursList.find(u => u.id == this.value);
-                    if (user) {
-                        salaireDisplay.textContent = user.paye;
-                    }
+                    utilisateurSelectionne = utilisateursList.find((u) => u.id == this.value) || null;
                 } else {
-                    salaireDisplay.textContent = '-';
+                    utilisateurSelectionne = null;
                 }
+                recalculerSalaire();
             });
-            
+
+            primeInput.addEventListener("input", recalculerSalaire);
+            heureSupInput.addEventListener("input", recalculerSalaire);
+
             function mettreAJourNoms(serviceFiltre) {
                 nomSelect.innerHTML = '<option value="">Sélectionnez un nom</option>';
-                salaireDisplay.textContent = '-';
-                
+                utilisateurSelectionne = null;
+                recalculerSalaire();
+
                 // Filtrer les utilisateurs par service
                 let utilisateursFiltres = utilisateursList;
                 if (serviceFiltre) {
-                    utilisateursFiltres = utilisateursList.filter(u => u.service === serviceFiltre);
+                    utilisateursFiltres = utilisateursList.filter((u) => u.service === serviceFiltre);
                 }
-                
+
                 // Ajouter les options
-                utilisateursFiltres.forEach(user => {
-                    const option = document.createElement('option');
+                utilisateursFiltres.forEach((user) => {
+                    const option = document.createElement("option");
                     option.value = user.id;
                     option.textContent = user.nomprenom;
                     nomSelect.appendChild(option);
                 });
             }
-            
+
+            function lireNombre(input) {
+                const raw = (input.value || "").toString().replace(",", ".");
+                const value = parseFloat(raw);
+                return Number.isFinite(value) ? value : 0;
+            }
+
+            function recalculerSalaire() {
+                if (!utilisateurSelectionne) {
+                    salaireDisplay.textContent = "-";
+                    mettreAJourBoutons(false);
+                    return;
+                }
+
+                const base = parseFloat(utilisateurSelectionne.paye);
+                const prime = lireNombre(primeInput);
+                const heuresSup = lireNombre(heureSupInput);
+                const total = base + prime + heuresSup * TAUX_HEURE_SUP;
+
+                if (Number.isFinite(total)) {
+                    salaireDisplay.textContent = salaireFormatter.format(total);
+                    mettreAJourBoutons(true);
+                    return;
+                }
+
+                salaireDisplay.textContent = "-";
+                mettreAJourBoutons(true);
+            }
+
+            function mettreAJourBoutons(estActif) {
+                boutonTelecharger.disabled = !estActif;
+                boutonEnvoyer.disabled = !estActif;
+                boutonEnregistrer.disabled = !estActif;
+            }
+
             // Charger tous les noms au démarrage
-            mettreAJourNoms('');
+            mettreAJourNoms("");
         </script>
     </body>
 </html>
