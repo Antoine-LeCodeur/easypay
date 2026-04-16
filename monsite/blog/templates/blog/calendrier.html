@@ -17,7 +17,7 @@
         </header>
         <main>
             <div class="main-box">
-                <div class="main-box-box main-box-box-red">
+                <div class="main-box-box">
                     <div class="main-box-box-titre">
                         <h4>Janvier</h4>
                     </div>
@@ -31,7 +31,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="main-box-box main-box-box-red">
+                <div class="main-box-box">
                     <div class="main-box-box-titre">
                         <h4>Fevrier</h4>
                     </div>
@@ -45,7 +45,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="main-box-box main-box-box-red">
+                <div class="main-box-box">
                     <div class="main-box-box-titre">
                         <h4>Mars</h4>
                     </div>
@@ -59,7 +59,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="main-box-box main-box-box-green">
+                <div class="main-box-box">
                     <div class="main-box-box-titre">
                         <h4>Avril</h4>
                     </div>
@@ -73,7 +73,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="main-box-box main-box-box-black">
+                <div class="main-box-box">
                     <div class="main-box-box-titre">
                         <h4>Mai</h4>
                     </div>
@@ -87,7 +87,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="main-box-box main-box-box-black">
+                <div class="main-box-box">
                     <div class="main-box-box-titre">
                         <h4>Juin</h4>
                     </div>
@@ -101,7 +101,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="main-box-box main-box-box-black">
+                <div class="main-box-box">
                     <div class="main-box-box-titre">
                         <h4>Juillet</h4>
                     </div>
@@ -115,7 +115,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="main-box-box main-box-box-black">
+                <div class="main-box-box">
                     <div class="main-box-box-titre">
                         <h4>Aout</h4>
                     </div>
@@ -129,7 +129,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="main-box-box main-box-box-black">
+                <div class="main-box-box">
                     <div class="main-box-box-titre">
                         <h4>Septembre</h4>
                     </div>
@@ -143,7 +143,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="main-box-box main-box-box-black">
+                <div class="main-box-box">
                     <div class="main-box-box-titre">
                         <h4>Octobre</h4>
                     </div>
@@ -157,7 +157,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="main-box-box main-box-box-black">
+                <div class="main-box-box">
                     <div class="main-box-box-titre">
                         <h4>Novembre</h4>
                     </div>
@@ -171,7 +171,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="main-box-box main-box-box-black">
+                <div class="main-box-box">
                     <div class="main-box-box-titre">
                         <h4>Decembre</h4>
                     </div>
@@ -187,5 +187,33 @@
                 </div>
             </div>
         </main>
+        <script>
+            // Array of months in French
+            const months = ["Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Aout", "Septembre", "Octobre", "Novembre", "Decembre"];
+            
+            // Get current month (0-11)
+            const currentMonth = new Date().getMonth();
+            
+            // Get all month boxes
+            const monthBoxes = document.querySelectorAll('.main-box-box');
+            
+            // Apply colors based on month comparison
+            monthBoxes.forEach((box, index) => {
+                // Remove all color classes
+                box.classList.remove('main-box-box-red', 'main-box-box-green', 'main-box-box-black');
+                
+                // Apply appropriate color class
+                if (index < currentMonth) {
+                    // Past months - Red
+                    box.classList.add('main-box-box-red');
+                } else if (index === currentMonth) {
+                    // Current month - Green
+                    box.classList.add('main-box-box-green');
+                } else {
+                    // Future months - Black
+                    box.classList.add('main-box-box-black');
+                }
+            });
+        </script>
     </body>
 </html>
