@@ -66,6 +66,7 @@
                 maximumFractionDigits: 2,
             });
             const TAUX_HEURE_SUP = 100;
+            const enregistrerUrl = "{% url 'enregistrer_paye' %}";
 
             let utilisateurSelectionne = null;
 
@@ -86,6 +87,57 @@
 
             primeInput.addEventListener("input", recalculerSalaire);
             heureSupInput.addEventListener("input", recalculerSalaire);
+
+            boutonEnregistrer.addEventListener("click", async function (event) {
+                event.preventDefault();
+
+                if (!utilisateurSelectionne) {
+                    return;
+                }
+
+                const prime = lireNombre(primeInput);
+                const heuresSup = lireNombre(heureSupInput);
+                const utilisateurId = Number(nomSelect.value);
+                const utilisateurNom = nomSelect.options[nomSelect.selectedIndex]?.textContent || "";
+
+                if (!Number.isFinite(utilisateurId)) {
+                    return;
+                }
+
+                boutonEnregistrer.disabled = true;
+
+                try {
+                    const response = await fetch(enregistrerUrl, {
+                        method: "POST",
+                        credentials: "same-origin",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": getCookie("csrftoken"),
+                        },
+                        body: JSON.stringify({
+                            utilisateur_id: utilisateurId,
+                            utilisateur_nom: utilisateurNom,
+                            prime: prime,
+                            heures_sup: heuresSup,
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        const message = await response.text();
+                        alert("Erreur lors de l'enregistrement. " + message);
+                        return;
+                    }
+
+                    supprimerUtilisateur(utilisateurId);
+                    primeInput.value = "";
+                    heureSupInput.value = "";
+                    mettreAJourNoms(servicesSelect.value);
+                } catch (error) {
+                    alert("Erreur lors de l'enregistrement.");
+                } finally {
+                    mettreAJourBoutons(Boolean(utilisateurSelectionne));
+                }
+            });
 
             function mettreAJourNoms(serviceFiltre) {
                 nomSelect.innerHTML = '<option value="">Sélectionnez un nom</option>';
@@ -139,6 +191,24 @@
                 boutonTelecharger.disabled = !estActif;
                 boutonEnvoyer.disabled = !estActif;
                 boutonEnregistrer.disabled = !estActif;
+            }
+
+            function supprimerUtilisateur(utilisateurId) {
+                const index = utilisateursList.findIndex((u) => u.id == utilisateurId);
+                if (index >= 0) {
+                    utilisateursList.splice(index, 1);
+                }
+            }
+
+            function getCookie(name) {
+                const cookies = document.cookie ? document.cookie.split(";") : [];
+                for (let i = 0; i < cookies.length; i += 1) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.startsWith(name + "=")) {
+                        return decodeURIComponent(cookie.substring(name.length + 1));
+                    }
+                }
+                return "";
             }
 
             // Charger tous les noms au démarrage
