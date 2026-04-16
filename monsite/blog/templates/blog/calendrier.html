@@ -26,7 +26,7 @@
                             <a href="payes.html"><button>Payes</button></a>
                         </div>
                         <div class="main-box-box-bouton-stathistorique">
-                            <a href="stat.html"><button>Stats</button></a>
+                            <a href="stat.html?mois=1"><button>Stats</button></a>
                             <a href="historique.html?mois=1"><button>Historique</button></a>
                         </div>
                     </div>
@@ -40,7 +40,7 @@
                             <a href="payes.html"><button>Payes</button></a>
                         </div>
                         <div class="main-box-box-bouton-stathistorique">
-                            <a href="stat.html"><button>Stats</button></a>
+                            <a href="stat.html?mois=2"><button>Stats</button></a>
                             <a href="historique.html?mois=2"><button>Historique</button></a>
                         </div>
                     </div>
@@ -54,7 +54,7 @@
                             <a href="payes.html"><button>Payes</button></a>
                         </div>
                         <div class="main-box-box-bouton-stathistorique">
-                            <a href="stat.html"><button>Stats</button></a>
+                            <a href="stat.html?mois=3"><button>Stats</button></a>
                             <a href="historique.html?mois=3"><button>Historique</button></a>
                         </div>
                     </div>
@@ -68,7 +68,7 @@
                             <a href="payes.html"><button>Payes</button></a>
                         </div>
                         <div class="main-box-box-bouton-stathistorique">
-                            <a href="stat.html"><button>Stats</button></a>
+                            <a href="stat.html?mois=4"><button>Stats</button></a>
                             <a href="historique.html?mois=4"><button>Historique</button></a>
                         </div>
                     </div>
@@ -82,7 +82,7 @@
                             <a href="payes.html"><button>Payes</button></a>
                         </div>
                         <div class="main-box-box-bouton-stathistorique">
-                            <a href="stat.html"><button>Stats</button></a>
+                            <a href="stat.html?mois=5"><button>Stats</button></a>
                             <a href="historique.html?mois=5"><button>Historique</button></a>
                         </div>
                     </div>
@@ -96,7 +96,7 @@
                             <a href="payes.html"><button>Payes</button></a>
                         </div>
                         <div class="main-box-box-bouton-stathistorique">
-                            <a href="stat.html"><button>Stats</button></a>
+                            <a href="stat.html?mois=6"><button>Stats</button></a>
                             <a href="historique.html?mois=6"><button>Historique</button></a>
                         </div>
                     </div>
@@ -110,7 +110,7 @@
                             <a href="payes.html"><button>Payes</button></a>
                         </div>
                         <div class="main-box-box-bouton-stathistorique">
-                            <a href="stat.html"><button>Stats</button></a>
+                            <a href="stat.html?mois=7"><button>Stats</button></a>
                             <a href="historique.html?mois=7"><button>Historique</button></a>
                         </div>
                     </div>
@@ -124,7 +124,7 @@
                             <a href="payes.html"><button>Payes</button></a>
                         </div>
                         <div class="main-box-box-bouton-stathistorique">
-                            <a href="stat.html"><button>Stats</button></a>
+                            <a href="stat.html?mois=8"><button>Stats</button></a>
                             <a href="historique.html?mois=8"><button>Historique</button></a>
                         </div>
                     </div>
@@ -138,7 +138,7 @@
                             <a href="payes.html"><button>Payes</button></a>
                         </div>
                         <div class="main-box-box-bouton-stathistorique">
-                            <a href="stat.html"><button>Stats</button></a>
+                            <a href="stat.html?mois=9"><button>Stats</button></a>
                             <a href="historique.html?mois=9"><button>Historique</button></a>
                         </div>
                     </div>
@@ -152,7 +152,7 @@
                             <a href="payes.html"><button>Payes</button></a>
                         </div>
                         <div class="main-box-box-bouton-stathistorique">
-                            <a href="stat.html"><button>Stats</button></a>
+                            <a href="stat.html?mois=10"><button>Stats</button></a>
                             <a href="historique.html?mois=10"><button>Historique</button></a>
                         </div>
                     </div>
@@ -166,7 +166,7 @@
                             <a href="payes.html"><button>Payes</button></a>
                         </div>
                         <div class="main-box-box-bouton-stathistorique">
-                            <a href="stat.html"><button>Stats</button></a>
+                            <a href="stat.html?mois=11"><button>Stats</button></a>
                             <a href="historique.html?mois=11"><button>Historique</button></a>
                         </div>
                     </div>
@@ -180,7 +180,7 @@
                             <a href="payes.html"><button>Payes</button></a>
                         </div>
                         <div class="main-box-box-bouton-stathistorique">
-                            <a href="stat.html"><button>Stats</button></a>
+                            <a href="stat.html?mois=12"><button>Stats</button></a>
                             <a href="historique.html?mois=12"><button>Historique</button></a>
                         </div>
                     </div>
@@ -190,28 +190,28 @@
         <script>
             // Array of months in French
             const months = ["Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Aout", "Septembre", "Octobre", "Novembre", "Decembre"];
-            
+
             // Get current month (0-11)
             const currentMonth = new Date().getMonth();
-            
+
             // Get all month boxes
-            const monthBoxes = document.querySelectorAll('.main-box-box');
-            
+            const monthBoxes = document.querySelectorAll(".main-box-box");
+
             // Apply colors based on month comparison
             monthBoxes.forEach((box, index) => {
                 // Remove all color classes
-                box.classList.remove('main-box-box-red', 'main-box-box-green', 'main-box-box-black');
-                
+                box.classList.remove("main-box-box-red", "main-box-box-green", "main-box-box-black");
+
                 // Apply appropriate color class
                 if (index < currentMonth) {
                     // Past months - Red
-                    box.classList.add('main-box-box-red');
+                    box.classList.add("main-box-box-red");
                 } else if (index === currentMonth) {
                     // Current month - Green
-                    box.classList.add('main-box-box-green');
+                    box.classList.add("main-box-box-green");
                 } else {
                     // Future months - Black
-                    box.classList.add('main-box-box-black');
+                    box.classList.add("main-box-box-black");
                 }
             });
         </script>
