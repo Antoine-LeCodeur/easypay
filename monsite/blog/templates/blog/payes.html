@@ -50,8 +50,22 @@
             </div>
         </main>
         <div id="utilisateurs-data" data-utilisateurs="{{ utilisateurs_json }}"></div>
+        <div id="historique-data" data-historique="{{ historique_json|default:"" }}"></div>
         <script>
             const utilisateursList = JSON.parse(document.getElementById("utilisateurs-data").getAttribute("data-utilisateurs"));
+            const historiqueDataElement = document.getElementById("historique-data");
+            let historiqueSelectionne = null;
+
+            if (historiqueDataElement) {
+                const historiqueRaw = historiqueDataElement.getAttribute("data-historique") || "";
+                if (historiqueRaw) {
+                    try {
+                        historiqueSelectionne = JSON.parse(historiqueRaw);
+                    } catch (error) {
+                        historiqueSelectionne = null;
+                    }
+                }
+            }
 
             const servicesSelect = document.getElementById("services");
             const nomSelect = document.getElementById("choix");
@@ -67,6 +81,7 @@
             });
             const TAUX_HEURE_SUP = 100;
             const enregistrerUrl = "{% url 'enregistrer_paye' %}";
+            const historiqueUrl = "{% url 'historique' %}";
 
             let utilisateurSelectionne = null;
 
@@ -107,6 +122,17 @@
                 boutonEnregistrer.disabled = true;
 
                 try {
+                    const payload = {
+                        utilisateur_id: utilisateurId,
+                        utilisateur_nom: utilisateurNom,
+                        prime: prime,
+                        heures_sup: heuresSup,
+                    };
+
+                    if (historiqueSelectionne && historiqueSelectionne.id) {
+                        payload.historique_id = historiqueSelectionne.id;
+                    }
+
                     const response = await fetch(enregistrerUrl, {
                         method: "POST",
                         credentials: "same-origin",
@@ -114,17 +140,17 @@
                             "Content-Type": "application/json",
                             "X-CSRFToken": getCookie("csrftoken"),
                         },
-                        body: JSON.stringify({
-                            utilisateur_id: utilisateurId,
-                            utilisateur_nom: utilisateurNom,
-                            prime: prime,
-                            heures_sup: heuresSup,
-                        }),
+                        body: JSON.stringify(payload),
                     });
 
                     if (!response.ok) {
                         const message = await response.text();
                         alert("Erreur lors de l'enregistrement. " + message);
+                        return;
+                    }
+
+                    if (historiqueSelectionne && historiqueSelectionne.id) {
+                        window.location.href = historiqueUrl;
                         return;
                     }
 
@@ -270,8 +296,77 @@
                 }
             });
 
-            // Charger tous les noms au démarrage
-            mettreAJourNoms("");
+            // Événement pour le bouton Envoyer
+            boutonEnvoyer.addEventListener("click", async function (event) {
+                event.preventDefault();
+
+                if (!utilisateurSelectionne) {
+                    alert("Veuillez sélectionner un employé.");
+                    return;
+                }
+
+                const prime = lireNombre(primeInput);
+                const heuresSup = lireNombre(heureSupInput);
+                const utilisateurId = Number(nomSelect.value);
+
+                if (!Number.isFinite(utilisateurId)) {
+                    alert("Employé invalide.");
+                    return;
+                }
+
+                boutonEnvoyer.disabled = true;
+
+                try {
+                    const response = await fetch("{% url 'envoyer_fiche_paye' %}", {
+                        method: "POST",
+                        credentials: "same-origin",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": getCookie("csrftoken"),
+                        },
+                        body: JSON.stringify({
+                            utilisateur_id: utilisateurId,
+                            prime: prime,
+                            heures_sup: heuresSup,
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        alert("Erreur: " + (errorData.error || "Erreur lors de l'envoi"));
+                        return;
+                    }
+
+                    const data = await response.json();
+                    alert("✓ Email envoyé à " + utilisateurSelectionne.mail);
+                } catch (error) {
+                    alert("Erreur lors de l'envoi du PDF.");
+                    console.error(error);
+                } finally {
+                    mettreAJourBoutons(Boolean(utilisateurSelectionne));
+                }
+            });
+
+            function initialiserFormulaire() {
+                if (historiqueSelectionne) {
+                    servicesSelect.value = historiqueSelectionne.service || "";
+                    mettreAJourNoms(servicesSelect.value);
+                    nomSelect.value = String(historiqueSelectionne.utilisateur_id || "");
+                    utilisateurSelectionne =
+                        utilisateursList.find((u) => u.id == historiqueSelectionne.utilisateur_id) || null;
+                    primeInput.value = historiqueSelectionne.prime ?? "";
+                    heureSupInput.value = historiqueSelectionne.heures_sup ?? "";
+                    servicesSelect.disabled = true;
+                    nomSelect.disabled = true;
+                } else {
+                    mettreAJourNoms("");
+                }
+
+                recalculerSalaire();
+            }
+
+            // Charger les noms au demarrage
+            initialiserFormulaire();
         </script>
     </body>
 </html>

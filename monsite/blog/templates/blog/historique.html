@@ -1,5 +1,4 @@
-{% load static %}
-{% load custom_filters %}
+{% load static %} {% load custom_filters %}
 <!doctype html>
 <html lang="en">
     <head>
@@ -28,35 +27,35 @@
                             <select name="nom" id="nom">
                                 <option value="">Tous</option>
                                 {% for nom in noms %}
-                                    <option value="{{ nom }}" {% if nom == nom_filter %}selected{% endif %}>{{ nom }}</option>
+                                <option value="{{ nom }}" {% if nom == nom_filter %}selected{% endif %}>{{ nom }}</option>
                                 {% endfor %}
                             </select>
-                            
+
                             <label for="service">Services : </label>
                             <select name="service" id="service">
                                 <option value="">Tous</option>
                                 {% for service in services %}
-                                    <option value="{{ service }}" {% if service == service_filter %}selected{% endif %}>{{ service }}</option>
+                                <option value="{{ service }}" {% if service == service_filter %}selected{% endif %}>{{ service }}</option>
                                 {% endfor %}
                             </select>
-                            
+
                             <label for="mois">Mois : </label>
                             <select name="mois" id="mois">
                                 <option value="">Tous</option>
-                                <option value="1" {% if mois_filter == '1' %}selected{% endif %}>Janvier</option>
-                                <option value="2" {% if mois_filter == '2' %}selected{% endif %}>Février</option>
-                                <option value="3" {% if mois_filter == '3' %}selected{% endif %}>Mars</option>
-                                <option value="4" {% if mois_filter == '4' %}selected{% endif %}>Avril</option>
-                                <option value="5" {% if mois_filter == '5' %}selected{% endif %}>Mai</option>
-                                <option value="6" {% if mois_filter == '6' %}selected{% endif %}>Juin</option>
-                                <option value="7" {% if mois_filter == '7' %}selected{% endif %}>Juillet</option>
-                                <option value="8" {% if mois_filter == '8' %}selected{% endif %}>Août</option>
-                                <option value="9" {% if mois_filter == '9' %}selected{% endif %}>Septembre</option>
-                                <option value="10" {% if mois_filter == '10' %}selected{% endif %}>Octobre</option>
-                                <option value="11" {% if mois_filter == '11' %}selected{% endif %}>Novembre</option>
-                                <option value="12" {% if mois_filter == '12' %}selected{% endif %}>Décembre</option>
+                                <option value="1" {% if mois_filter == "1" %}selected{% endif %}>Janvier</option>
+                                <option value="2" {% if mois_filter == "2" %}selected{% endif %}>Février</option>
+                                <option value="3" {% if mois_filter == "3" %}selected{% endif %}>Mars</option>
+                                <option value="4" {% if mois_filter == "4" %}selected{% endif %}>Avril</option>
+                                <option value="5" {% if mois_filter == "5" %}selected{% endif %}>Mai</option>
+                                <option value="6" {% if mois_filter == "6" %}selected{% endif %}>Juin</option>
+                                <option value="7" {% if mois_filter == "7" %}selected{% endif %}>Juillet</option>
+                                <option value="8" {% if mois_filter == "8" %}selected{% endif %}>Août</option>
+                                <option value="9" {% if mois_filter == "9" %}selected{% endif %}>Septembre</option>
+                                <option value="10" {% if mois_filter == "10" %}selected{% endif %}>Octobre</option>
+                                <option value="11" {% if mois_filter == "11" %}selected{% endif %}>Novembre</option>
+                                <option value="12" {% if mois_filter == "12" %}selected{% endif %}>Décembre</option>
                             </select>
-                            
+
                             <button type="submit">Afficher</button>
                             <button type="button" onclick="resetFilters()">Reinitialiser</button>
                         </form>
@@ -87,11 +86,11 @@
                                 <p>{{ historique.heure|time:"H:i" }}</p>
                             </div>
                             <div class="main-box-historique-content-item-actions">
-                                <a href=""><button type="button">Modifier</button></a>
+                                <a href="{% url 'payes' %}?historique_id={{ historique.id }}"><button type="button">Modifier</button></a>
                             </div>
                         </div>
                         {% empty %}
-                        <div style="padding: 20px; text-align: center;">
+                        <div style="padding: 20px; text-align: center">
                             <p>Aucun résultat trouvé.</p>
                         </div>
                         {% endfor %}
@@ -102,11 +101,10 @@
         <script>
             function resetFilters() {
                 // Réinitialiser tous les selects à la première option (Tous)
-                document.getElementById('nom').value = '';
-                document.getElementById('service').value = '';
-                document.getElementById('mois').value = '';
+                document.getElementById("nom").value = "";
+                document.getElementById("service").value = "";
+                document.getElementById("mois").value = "";
             }
         </script>
     </body>
 </html>
-                           

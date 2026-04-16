@@ -5,19 +5,26 @@ from django.db import IntegrityError
 from django.http import JsonResponse, FileResponse
 from django.shortcuts import render
 from django.utils import timezone
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
-from django.views.decorators.http import require_POST, require_GET
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_POST
+from django.core.mail import EmailMessage
 
 from .models import Historique, Utilisateur
 import json
 
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
-from reportlab.pdfgen import canvas
 from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
+
+# Constantes
+MOIS_NOMS = {
+    1: "Janvier", 2: "Février", 3: "Mars", 4: "Avril", 5: "Mai", 6: "Juin",
+    7: "Juillet", 8: "Août", 9: "Septembre", 10: "Octobre", 11: "Novembre", 12: "Décembre"
+}
+TAUX_HEURE_SUP = 100
 
 
 def index(request):
@@ -70,11 +77,32 @@ def historique(request):
 @ensure_csrf_cookie
 def payes(request):
     today = timezone.localdate()
+    historique_id = request.GET.get("historique_id")
+    historique_selectionne = None
+    if historique_id:
+        try:
+            historique_id = int(historique_id)
+        except (TypeError, ValueError):
+            historique_id = None
+
+    if historique_id:
+        try:
+            historique_selectionne = Historique.objects.select_related("utilisateur").get(id=historique_id)
+        except Historique.DoesNotExist:
+            historique_selectionne = None
+
     utilisateurs_enregistres = Historique.objects.filter(
         mois=today.month,
         annee=today.year,
     ).values_list('utilisateur_id', flat=True)
     utilisateurs = Utilisateur.objects.exclude(id__in=utilisateurs_enregistres)
+
+    if historique_selectionne:
+        utilisateurs = (
+            utilisateurs
+            | Utilisateur.objects.filter(id=historique_selectionne.utilisateur_id)
+        ).distinct()
+
     services = utilisateurs.values_list('service', flat=True).distinct()
     
     # Convertir les utilisateurs en JSON
@@ -87,11 +115,25 @@ def payes(request):
         }
         for u in utilisateurs
     ])
+
+    historique_json = None
+    if historique_selectionne:
+        historique_json = json.dumps({
+            'id': historique_selectionne.id,
+            'utilisateur_id': historique_selectionne.utilisateur_id,
+            'nomprenom': historique_selectionne.utilisateur.nomprenom,
+            'service': historique_selectionne.utilisateur.service,
+            'prime': str(historique_selectionne.prime),
+            'heures_sup': str(historique_selectionne.heures_sup),
+            'mois': historique_selectionne.mois,
+            'annee': historique_selectionne.annee,
+        })
     
     context = {
         'utilisateurs': utilisateurs,
         'services': services,
-        'utilisateurs_json': utilisateurs_json
+        'utilisateurs_json': utilisateurs_json,
+        'historique_json': historique_json,
     }
     return render(request, 'blog/payes.html', context)
 
@@ -137,6 +179,27 @@ def enregistrer_paye(request):
     if prime_value < 0 or heures_sup_value < 0:
         return JsonResponse({"error": "Valeurs negatives interdites."}, status=400)
 
+    historique_id = payload.get("historique_id")
+    if historique_id:
+        try:
+            historique_id = int(historique_id)
+        except (TypeError, ValueError):
+            return JsonResponse({"error": "Historique invalide."}, status=400)
+
+        try:
+            historique = Historique.objects.select_related("utilisateur").get(id=historique_id)
+        except Historique.DoesNotExist:
+            return JsonResponse({"error": "Historique introuvable."}, status=404)
+
+        if historique.utilisateur_id != utilisateur_id:
+            return JsonResponse({"error": "Utilisateur invalide pour cet historique."}, status=400)
+
+        historique.prime = prime_value
+        historique.heures_sup = heures_sup_value
+        historique.save(update_fields=["prime", "heures_sup"])
+
+        return JsonResponse({"ok": True, "historique_id": historique.pk, "updated": True})
+
     today = timezone.localdate()
     if Historique.objects.filter(utilisateur_id=utilisateur_id, mois=today.month, annee=today.year).exists():
         return JsonResponse({"error": "Utilisateur deja enregistre pour ce mois."}, status=409)
@@ -170,12 +233,6 @@ def stat(request):
     else:
         mois = today.month
     
-    # Noms des mois en français
-    mois_noms = {
-        1: "Janvier", 2: "Février", 3: "Mars", 4: "Avril", 5: "Mai", 6: "Juin",
-        7: "Juillet", 8: "Août", 9: "Septembre", 10: "Octobre", 11: "Novembre", 12: "Décembre"
-    }
-    
     # Récupérer les statistiques du mois
     historiques = Historique.objects.filter(mois=mois, annee=today.year)
     
@@ -196,7 +253,7 @@ def stat(request):
     salaire_moyen = total_salaire / total_payes if total_payes > 0 else Decimal('0')
     
     context = {
-        'mois': mois_noms.get(mois, 'Mois inconnu'),
+        'mois': MOIS_NOMS.get(mois, 'Mois inconnu'),
         'prime_totale': prime_totale,
         'heures_sup_totale': heures_sup_totale,
         'total_payes': total_payes,
@@ -206,31 +263,8 @@ def stat(request):
     return render(request, 'blog/stat.html', context)
 
 
-@require_POST
-def telecharger_fiche_paye(request):
-    """Génère et télécharge une fiche de paye professionnelle en PDF"""
-    try:
-        payload = json.loads(request.body or b"{}")
-    except json.JSONDecodeError:
-        return JsonResponse({"error": "Donnees invalides."}, status=400)
-
-    utilisateur_id = payload.get("utilisateur_id")
-    if not utilisateur_id:
-        return JsonResponse({"error": "Utilisateur requis."}, status=400)
-
-    try:
-        utilisateur_id = int(utilisateur_id)
-    except (TypeError, ValueError):
-        return JsonResponse({"error": "Utilisateur invalide."}, status=400)
-
-    try:
-        utilisateur = Utilisateur.objects.get(id=utilisateur_id)
-    except Utilisateur.DoesNotExist:
-        return JsonResponse({"error": "Utilisateur introuvable."}, status=404)
-
-    prime = float(payload.get("prime", 0))
-    heures_sup = float(payload.get("heures_sup", 0))
-
+def generer_fiche_paye_pdf(utilisateur, prime, heures_sup):
+    """Génère le contenu PDF d'une fiche de paye"""
     # Calcul du salaire
     salaire_base = float(utilisateur.paye)
     taux_heure_sup = 100
@@ -245,9 +279,6 @@ def telecharger_fiche_paye(request):
     buffer = BytesIO()
     
     # Config page
-    from reportlab.lib.styles import ParagraphStyle
-    from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
-    
     doc = SimpleDocTemplate(
         buffer, 
         pagesize=A4,
@@ -303,13 +334,9 @@ def telecharger_fiche_paye(request):
     
     # ===== INFORMATIONS EMPLOYÉ ET PÉRIODE =====
     today = timezone.localdate()
-    mois_noms = {
-        1: "Janvier", 2: "Février", 3: "Mars", 4: "Avril", 5: "Mai", 6: "Juin",
-        7: "Juillet", 8: "Août", 9: "Septembre", 10: "Octobre", 11: "Novembre", 12: "Décembre"
-    }
     
     info_data = [
-        ["Nom et Prénom:", utilisateur.nomprenom, "", "Période:", f"{mois_noms.get(today.month)} {today.year}"],
+        ["Nom et Prénom:", utilisateur.nomprenom, "", "Période:", f"{MOIS_NOMS.get(today.month)} {today.year}"],
         ["Service:", utilisateur.service, "", "Date émission:", today.strftime("%d/%m/%Y")],
         ["Email:", utilisateur.mail, "", ""],
     ]
@@ -403,16 +430,12 @@ def telecharger_fiche_paye(request):
     
     # ===== RÉSUMÉ FINAL =====
     resume_data = [
-        ["Salaire brut", f"{salaire_brut:.2f} €", colors.HexColor('#1f4788')],
-        ["Retenues", f"- {cotisation_salariale:.2f} €", colors.red],
-        ["SALAIRE NET À PAYER", f"{salaire_net:.2f} €", colors.HexColor('#2ecc71')],
+        ["Salaire brut", f"{salaire_brut:.2f} €"],
+        ["Retenues", f"- {cotisation_salariale:.2f} €"],
+        ["SALAIRE NET À PAYER", f"{salaire_net:.2f} €"],
     ]
     
-    resume_table_data = []
-    for row in resume_data:
-        resume_table_data.append(row[:2])
-    
-    resume_table = Table(resume_table_data, colWidths=[14*cm, 4*cm])
+    resume_table = Table(resume_data, colWidths=[14*cm, 4*cm])
     resume_styles = [
         ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
         ('ALIGN', (0, 0), (0, -1), 'LEFT'),
@@ -438,8 +461,102 @@ def telecharger_fiche_paye(request):
     doc.build(elements)
     buffer.seek(0)
     
+    return buffer
+
+
+@require_POST
+def telecharger_fiche_paye(request):
+    """Génère et télécharge une fiche de paye professionnelle en PDF"""
+    try:
+        payload = json.loads(request.body or b"{}")
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Donnees invalides."}, status=400)
+
+    utilisateur_id = payload.get("utilisateur_id")
+    if not utilisateur_id:
+        return JsonResponse({"error": "Utilisateur requis."}, status=400)
+
+    try:
+        utilisateur_id = int(utilisateur_id)
+    except (TypeError, ValueError):
+        return JsonResponse({"error": "Utilisateur invalide."}, status=400)
+
+    try:
+        utilisateur = Utilisateur.objects.get(id=utilisateur_id)
+    except Utilisateur.DoesNotExist:
+        return JsonResponse({"error": "Utilisateur introuvable."}, status=404)
+
+    prime = float(payload.get("prime", 0))
+    heures_sup = float(payload.get("heures_sup", 0))
+
+    # Générer le PDF
+    buffer = generer_fiche_paye_pdf(utilisateur, prime, heures_sup)
+    
+    today = timezone.localdate()
+    
     # Retourner le PDF en téléchargement
     nom_fichier = f"Fiche_Paye_{utilisateur.nomprenom}_{today.month}_{today.year}.pdf"
     response = FileResponse(buffer, as_attachment=True, filename=nom_fichier)
     response['Content-Type'] = 'application/pdf'
     return response
+
+
+@require_POST
+def envoyer_fiche_paye(request):
+    """Génère et envoie une fiche de paye par email"""
+    try:
+        payload = json.loads(request.body or b"{}")
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Donnees invalides."}, status=400)
+
+    utilisateur_id = payload.get("utilisateur_id")
+    if not utilisateur_id:
+        return JsonResponse({"error": "Utilisateur requis."}, status=400)
+
+    try:
+        utilisateur_id = int(utilisateur_id)
+    except (TypeError, ValueError):
+        return JsonResponse({"error": "Utilisateur invalide."}, status=400)
+
+    try:
+        utilisateur = Utilisateur.objects.get(id=utilisateur_id)
+    except Utilisateur.DoesNotExist:
+        return JsonResponse({"error": "Utilisateur introuvable."}, status=404)
+
+    prime = float(payload.get("prime", 0))
+    heures_sup = float(payload.get("heures_sup", 0))
+
+    try:
+        # Générer le PDF
+        buffer = generer_fiche_paye_pdf(utilisateur, prime, heures_sup)
+        
+        today = timezone.localdate()
+        
+        # Préparer l'email
+        sujet = f"Fiche de paye - {MOIS_NOMS.get(today.month)} {today.year}"
+        message = f"""Bonjour {utilisateur.nomprenom},
+
+Veuillez trouver ci-joint votre fiche de paye pour le mois de {MOIS_NOMS.get(today.month).lower()} {today.year}.
+
+Cordialement,
+EasyPay"""
+        
+        email = EmailMessage(
+            subject=sujet,
+            body=message,
+            from_email='easypayofficial92i@gmail.com',
+            to=[utilisateur.mail]
+        )
+        
+        # Ajouter la pièce jointe PDF
+        nom_fichier = f"Fiche_Paye_{utilisateur.nomprenom}_{today.month}_{today.year}.pdf"
+        buffer.seek(0)
+        email.attach(nom_fichier, buffer.read(), 'application/pdf')
+        
+        # Envoyer l'email
+        email.send()
+        
+        return JsonResponse({"ok": True, "message": f"Email envoyé à {utilisateur.mail}"})
+    
+    except Exception as e:
+        return JsonResponse({"error": f"Erreur lors de l'envoi: {str(e)}"}, status=500)
